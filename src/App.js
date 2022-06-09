@@ -521,16 +521,40 @@ const particlesOptions = {
   "zLayers": 100
 }
 
+const initialState = {
+  input: '',
+  imageUrl: '',
+  box: {},
+  route: 'signin',
+  isSignedIn: false,
+  user: {
+    id: '',
+    name: '',
+    email: '',
+    entries: 0,
+    joined: ''
+  }
+}
+
 class App extends Component {
   constructor() {
     super();
-    this.state = {
-      input: '',
-      imageUrl: '',
-      box: {},
-      route: 'signin',
-      isSignedIn: false
-    }
+    this.state = initialState;
+  }
+
+  loadUser = (data) => {
+    console.log('data', data);
+    this.setState(
+      {
+        user: {
+          id: data.id,
+          name: data.name,
+          email: data.email,
+          entries: data.entries,
+          joined: data.joined
+        }
+      }
+    )
   }
 
   calculateFaceLocation = (data) => {
@@ -588,13 +612,29 @@ class App extends Component {
       .then(result => {
         let response = JSON.parse(result, null, 2);
         this.displayFaceBox(this.calculateFaceLocation(response));
+
+        if(response){
+          console.log('id =', this.state.user.id);
+          fetch('http://localhost:3000/image', {
+            method: 'put',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({id: this.state.user.id})
+          })
+          .then(response => response.json())
+          .then(count => {
+            this.setState(Object.assign(this.state.user, { entries: count }));
+            console.log('user =', this.state.user);
+          })
+          .catch(error => console.log('error', error));
+        }
+
       })
       .catch(error => console.log('error', error));
   }
 
   onRouteChange = (route) => {
     if(route === 'signout') {
-      this.setState({isSignedIn: false});
+      this.setState(initialState);
     } else if(route === 'home') {
       this.setState({isSignedIn: true});
     }
@@ -614,7 +654,7 @@ class App extends Component {
       { route === 'home' 
         ? <div>
             <Logo />
-            <Rank />
+            <Rank name={this.state.user.name} entries={this.state.user.entries}/>
             <ImageLinkForm 
               onInputChange={this.onInputChange} 
               onButtonSubmit={this.onButtonSubmit} 
@@ -623,8 +663,8 @@ class App extends Component {
           </div>
         : (
             route === 'signin' 
-            ? <Signin onRouteChange={this.onRouteChange}/>
-            : <Register onRouteChange={this.onRouteChange}/>
+            ? <Signin onRouteChange={this.onRouteChange} loadUser={this.loadUser}/>
+            : <Register onRouteChange={this.onRouteChange} loadUser={this.loadUser}/>
           ) 
       }
     </div>
