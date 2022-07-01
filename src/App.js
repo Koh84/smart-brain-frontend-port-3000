@@ -9,6 +9,8 @@ import Signin from './components/Signin/Signin';
 import Particles from "react-tsparticles";
 import './App.css';
 import { Component } from 'react';
+import Modal from './components/Modal/Modal';
+import Profile from './components/Profile/Profile';
 
 const particlesOptions = {
   "autoPlay": true,
@@ -527,6 +529,7 @@ const initialState = {
   box: {},
   route: 'home',
   isSignedIn: true,
+  isProfileOpen: false,
   user: {
     id: '',
     name: '',
@@ -641,15 +644,29 @@ class App extends Component {
     this.setState({route: route});
   }
 
+  toggleModal = () => {
+    this.setState(prevState => ({
+      ...prevState,
+      isProfileOpen: !prevState.isProfileOpen
+    }))
+  }
+
   render() {
-    const { box, imageUrl, isSignedIn, route } = this.state;
+    const { box, imageUrl, isSignedIn, route, isProfileOpen } = this.state;
     return (
     <div className="App">
       <Particles className='particles'
         id="tsparticles"
         options={particlesOptions}
       />
-      <Navigation onRouteChange={this.onRouteChange} isSignedIn={isSignedIn}/>
+      <Navigation onRouteChange={this.onRouteChange} isSignedIn={isSignedIn}
+      toggleModal={this.toggleModal}/>
+
+      { isProfileOpen && 
+        <Modal>
+          <Profile isProfileOpen={isProfileOpen} toggleModal={this.toggleModal}/>
+        </Modal> 
+      }
 
       { route === 'home' 
         ? <div>
