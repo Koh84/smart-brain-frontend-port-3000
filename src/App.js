@@ -527,8 +527,8 @@ const initialState = {
   input: '',
   imageUrl: '',
   box: {},
-  route: 'home',
-  isSignedIn: true,
+  route: 'signin',
+  isSignedIn: false,
   isProfileOpen: false,
   user: {
     id: '',
