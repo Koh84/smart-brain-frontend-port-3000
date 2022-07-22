@@ -545,6 +545,31 @@ class App extends Component {
     this.state = initialState;
   }
 
+  componentDidMount() {
+    const token = window.sessionStorage.getItem('token');
+    if(token) {
+      fetch('http://localhost:3000/signin', {
+        method: 'post',
+        //Authorization need to be changed to 'Bearer ' + token in future
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        }
+      })
+      .then(resp => {
+        console.log('resp :', resp);
+        return resp.json()
+      })
+      .then(data => {
+        console.log('data :', data);
+        if(data && data.id) {
+          console.log('success we need to get user profile');
+        }
+      })
+      .catch(console.log)
+    }
+  }
+
   loadUser = (data) => {
     console.log('data', data);
     this.setState(
