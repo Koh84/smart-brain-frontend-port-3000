@@ -658,7 +658,10 @@ class App extends Component {
           console.log('id =', this.state.user.id);
           fetch('http://localhost:3000/image', {
             method: 'put',
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': window.sessionStorage.getItem('token')
+            },
             body: JSON.stringify({id: this.state.user.id})
           })
           .then(response => response.json())
